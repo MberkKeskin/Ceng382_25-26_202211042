@@ -258,12 +258,12 @@ body {
   .clock {
     font-size: 24px;
     font-weight: bold;
-    color: #f4a261; /* Match the color used on the site */
+    color: #f4a261; 
     position: absolute;
     top: 20px;
     right: 20px;
-    font-family: 'Poppins', sans-serif; /* Same font as used on the page */
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Optional: for better visibility */
+    font-family: 'Poppins', sans-serif; 
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); 
 }
 .clock ul{
   list-style: none;
