@@ -255,5 +255,19 @@ body {
     object-fit: cover; 
     z-index: -1; 
   }
-  
-  
+  .clock {
+    font-size: 24px;
+    font-weight: bold;
+    color: #f4a261; /* Match the color used on the site */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: 'Poppins', sans-serif; /* Same font as used on the page */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Optional: for better visibility */
+}
+.clock ul{
+  list-style: none;
+  display:flex ;
+  font-size: 24px;
+  gap: 24px;
+}
