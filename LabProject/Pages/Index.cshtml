@@ -1,49 +1,44 @@
-﻿@page "{id?}"
+﻿@page
 @model LabProject.Pages.IndexModel
-
 @{
-    ViewData["Title"] = "Sınıf Yönetimi";
+    ViewData["Title"] = "Class Management";
 }
 
-<div class="container mt-5">
+<div class="container mt-4">
     <div class="row">
-        <!-- Sınıf Ekleme Formu -->
-        <div class="col-md-6">
+        <!-- Form Section -->
+        <div class="col-md-5">
             <div class="card">
-                <div class="card-header text-center bg-primary text-white">
-                    <h4>@(Model.EditId.HasValue ? "Sınıfı Düzenle" : "Yeni Sınıf Ekle")</h4>
+                <div class="card-header bg-primary text-white">
+                    <h3>@(Model.EditId.HasValue ? "Edit Class" : "Add New Class")</h3>
                 </div>
                 <div class="card-body">
                     <form method="post">
                         <input type="hidden" asp-for="NewClass.Id" />
-                        
-                        <div class="form-group">
-                            <label for="ClassName" class="form-label">Sınıf Adı</label>
-                            <input type="text" class="form-control" asp-for="NewClass.ClassName" />
-                            <span class="text-danger" asp-validation-for="NewClass.ClassName"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Class Name</label>
+                            <input asp-for="NewClass.ClassName" class="form-control" />
+                            <span asp-validation-for="NewClass.ClassName" class="text-danger"></span>
                         </div>
-
-                        <div class="form-group">
-                            <label for="StudentCount" class="form-label">Öğrenci Sayısı</label>
-                            <input type="number" class="form-control" asp-for="NewClass.StudentCount" />
-                            <span class="text-danger" asp-validation-for="NewClass.StudentCount"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Student Count</label>
+                            <input asp-for="NewClass.StudentCount" class="form-control" />
+                            <span asp-validation-for="NewClass.StudentCount" class="text-danger"></span>
                         </div>
-
-                        <div class="form-group">
-                            <label for="Description" class="form-label">Açıklama</label>
-                            <textarea class="form-control" asp-for="NewClass.Description"></textarea>
-                            <span class="text-danger" asp-validation-for="NewClass.Description"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea asp-for="NewClass.Description" class="form-control"></textarea>
+                            <span asp-validation-for="NewClass.Description" class="text-danger"></span>
                         </div>
-
                         <div class="d-flex justify-content-between">
                             @if (Model.EditId.HasValue)
                             {
-                                <button type="submit" class="btn btn-warning" asp-page-handler="Edit">Güncelle</button>
-                                <a asp-page="Index" class="btn btn-outline-secondary">İptal</a>
+                                <button type="submit" class="btn btn-warning" asp-page-handler="Edit">Update</button>
+                                <button type="submit" class="btn btn-secondary" asp-page-handler="Cancel">Cancel</button>
                             }
                             else
                             {
-                                <button type="submit" class="btn btn-primary" asp-page-handler="Add">Sınıf Ekle</button>
+                                <button type="submit" class="btn btn-primary" asp-page-handler="Add">Add Class</button>
                             }
                         </div>
                     </form>
@@ -51,21 +46,26 @@
             </div>
         </div>
 
-        <!-- Sınıf Listesi -->
-        <div class="col-md-6">
+        <!-- Table Section -->
+        <div class="col-md-7">
             <div class="card">
-                <div class="card-header text-center bg-success text-white">
-                    <h4>Sınıf Listesi</h4>
+                <div class="card-header bg-success text-white">
+                    <h3>Class List</h3>
                 </div>
                 <div class="card-body">
-                    <table class="table table-hover">
-                        <thead class="thead-dark">
+                    <form method="get" class="mb-3 d-flex gap-2">
+                        <input name="filter" value="@Model.Filter" class="form-control" placeholder="Search by class name..." />
+                        <button class="btn btn-outline-primary" type="submit">Filter</button>
+                    </form>
+
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
                             <tr>
-                                <th>ID</th>
-                                <th>Sınıf Adı</th>
-                                <th>Öğrenci Sayısı</th>
-                                <th>Açıklama</th>
-                                <th>İşlemler</th>
+                                <th>#</th>
+                                <th>Class Name</th>
+                                <th>Student Count</th>
+                                <th>Description</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,18 +76,36 @@
                                     <td>@item.ClassName</td>
                                     <td>@item.StudentCount</td>
                                     <td>@item.Description</td>
-                                    <td>
-                                        <a asp-page="Index" asp-route-id="@item.Id" class="btn btn-info btn-sm">Düzenle</a>
-                                        <form method="post" class="d-inline">
-                                            <button type="submit" asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</button>
+                                   <td>
+                                     <a asp-page="./Index" asp-route-id="@item.Id" class="btn btn-sm btn-info">Edit</a>
+
+
+                                        <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
+
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination">
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                                    <a class="page-link" href="?pageNumber=@i&filter=@Model.Filter">@i</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

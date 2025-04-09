@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using LabProject.Models;
 using System.Collections.Generic;
 using System.Linq;
-using LabProject.Models;
 
 namespace LabProject.Pages
 {
@@ -17,16 +17,39 @@ namespace LabProject.Pages
         [BindProperty]
         public int? EditId { get; set; }
 
-        public List<ClassInformationModel> DisplayClassList { get; set; } = new List<ClassInformationModel>();
+        [BindProperty(SupportsGet = true)]
+        public string? Filter { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        public const int PageSize = 10;
+        public int TotalPages { get; set; }
+
+        public List<ClassInformationModel> DisplayClassList { get; set; } = new();
 
         public void OnGet(int? id = null)
         {
-            DisplayClassList = ClassList.ToList();
+            // Filtre uygula
+            var query = ClassList.AsQueryable();
 
+            if (!string.IsNullOrEmpty(Filter))
+            {
+                query = query.Where(c => c.ClassName.Contains(Filter, System.StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Sayfalama
+            TotalPages = (int)System.Math.Ceiling(query.Count() / (double)PageSize);
+            DisplayClassList = query
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            // Edit
             if (id.HasValue && ClassList.Any(c => c.Id == id))
             {
                 EditId = id;
-                NewClass = ClassList.FirstOrDefault(c => c.Id == id) ?? new ClassInformationModel();
+                NewClass = ClassList.First(c => c.Id == id);
             }
             else
             {
@@ -43,38 +66,31 @@ namespace LabProject.Pages
                 return Page();
             }
 
-            NewClass.Id = nextId++; // Yeni sınıf eklerken ID'yi al ve artır
+            NewClass.Id = nextId++;
             ClassList.Add(NewClass);
             return RedirectToPage("./Index", new { id = (int?)null });
         }
 
-       public IActionResult OnPostDelete(int id)
-{
-    var item = ClassList.FirstOrDefault(c => c.Id == id);
-    if (item != null)
-    {
-        ClassList.Remove(item);
+        public IActionResult OnPostDelete(int id)
+        {
+            var item = ClassList.FirstOrDefault(c => c.Id == id);
+            if (item != null)
+            {
+                ClassList.Remove(item);
+                ReassignIds();
+            }
 
-        // ID'yi sıfırla ve listeyi yeniden düzenle
-        ReassignIds();
-    }
+            return RedirectToPage("./Index", new { id = (int?)null });
+        }
 
-    // Silme işlemi sonrasında yeni sınıf eklemek için yönlendir
-    return RedirectToPage("./Index", new { id = (int?)null });
-}
-
-
-        // ID'leri yeniden sıralamak için kullanılan yardımcı metod
         private void ReassignIds()
         {
-            // ID'leri sıfırdan yeniden düzenle
-            var counter = 1;
+            int counter = 1;
             foreach (var item in ClassList)
             {
                 item.Id = counter++;
             }
 
-            // En son kullanılan ID'yi güncelle
             nextId = counter;
         }
 
@@ -93,12 +109,12 @@ namespace LabProject.Pages
                 existingClass.Description = NewClass.Description;
             }
 
-            return RedirectToPage("./Index", new { id = (int?)null }); // Edit sonrası yeni ekleme moduna dön
+            return RedirectToPage("./Index", new { id = (int?)null });
         }
 
         public IActionResult OnPostCancel()
         {
-            return RedirectToPage("./Index", new { id = (int?)null }); // İptal edince edit modunu kapat
+            return RedirectToPage("./Index", new { id = (int?)null });
         }
     }
 }
