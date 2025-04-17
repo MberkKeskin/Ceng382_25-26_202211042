@@ -1,0 +1,83 @@
+﻿@page
+@model LabProject.Pages.IndexModel
+@{
+    ViewData["Title"] = "Class List";
+}
+
+<h1>Class List</h1>
+
+<form method="get" class="mb-3">
+    <input type="text" name="Filter" value="@Model.Filter" placeholder="Filter by Class Name" class="form-control w-25 d-inline-block" />
+    <button type="submit" class="btn btn-primary">Apply</button>
+</form>
+
+<div class="d-flex gap-2 mb-2">
+    <button id="exportAll" class="btn btn-outline-success">Export All</button>
+    <button id="exportFiltered" class="btn btn-outline-primary">Export Filtered</button>
+</div>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th class="selectable" data-col="ClassName">Class Name</th>
+            <th class="selectable" data-col="StudentCount">Student Count</th>
+            <th class="selectable" data-col="Description">Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PagedList)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.ClassName</td>
+                <td>@item.StudentCount</td>
+                <td>@item.Description</td>
+                <td>
+                    </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link" href="?PageNumber=@i&Filter=@Model.Filter">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+@section Scripts {
+<script>
+    let selectedColumns = [];
+
+    document.querySelectorAll(".selectable").forEach(header => {
+        header.addEventListener("click", () => {
+            const col = header.dataset.col;
+            const index = selectedColumns.indexOf(col);
+            if (index > -1) {
+                selectedColumns.splice(index, 1);
+                header.style.backgroundColor = "";
+            } else {
+                selectedColumns.push(col);
+                header.style.backgroundColor = "#b2ebf2";
+            }
+        });
+    });
+
+    document.getElementById("exportAll").addEventListener("click", () => {
+        const url = `/Index?handler=ExportJson&filtered=false&columns=${selectedColumns.join(',')}`;
+        window.location.href = url;
+    });
+
+    document.getElementById("exportFiltered").addEventListener("click", () => {
+        const url = `/Index?handler=ExportJson&filtered=true&columns=${selectedColumns.join(',')}`;
+        window.location.href = url;
+    });
+</script>
+}
