@@ -1,0 +1,23 @@
+[
+    {
+      "Username": "user1",
+      "Password": "password1",
+      "Role": "Admin",
+      "IsActive": true,
+      "CreatedAt": "2025-04-18T10:00:00Z"
+    },
+    {
+      "Username": "user2",
+      "Password": "password2",
+      "Role": "User",
+      "IsActive": true,
+      "CreatedAt": "2025-04-18T10:15:00Z"
+    },
+    {
+      "Username": "inactive",
+      "Password": "password",
+      "Role": "Guest",
+      "IsActive": false,
+      "CreatedAt": "2025-04-18T10:30:00Z"
+    }
+  ]
