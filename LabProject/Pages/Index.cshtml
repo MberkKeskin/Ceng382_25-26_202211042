@@ -1,83 +1,139 @@
 ﻿@page
 @model LabProject.Pages.IndexModel
 @{
-    ViewData["Title"] = "Class List";
+    ViewData["Title"] = "Class Management";
 }
 
-<h1>Class List</h1>
-
-<form method="get" class="mb-3">
-    <input type="text" name="Filter" value="@Model.Filter" placeholder="Filter by Class Name" class="form-control w-25 d-inline-block" />
-    <button type="submit" class="btn btn-primary">Apply</button>
-</form>
-
-<div class="d-flex gap-2 mb-2">
-    <button id="exportAll" class="btn btn-outline-success">Export All</button>
-    <button id="exportFiltered" class="btn btn-outline-primary">Export Filtered</button>
+<!-- Üst Menü -->
+<div class="d-flex justify-content-end align-items-center mb-4 gap-2">
+    <button type="button" class="btn btn-success" onclick="exportCurrentPage()">📥 Export JSON</button>
+    <form method="get" asp-page="/Logout">
+        <button type="submit" class="btn btn-outline-danger">🚪 Logout</button>
+    </form>
 </div>
 
-<table class="table table-bordered">
-    <thead class="table-dark">
-        <tr>
-            <th>#</th>
-            <th class="selectable" data-col="ClassName">Class Name</th>
-            <th class="selectable" data-col="StudentCount">Student Count</th>
-            <th class="selectable" data-col="Description">Description</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.PagedList)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.ClassName</td>
-                <td>@item.StudentCount</td>
-                <td>@item.Description</td>
-                <td>
-                    </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="row">
+    <!-- Sol: Add New Class -->
+    <div class="col-md-4">
+        <div class="card shadow-sm rounded-4">
+            <div class="card-header bg-gradient bg-info text-white text-center fs-5 rounded-top-4">
+                ➕ Add New Class
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="AddClass" class="d-grid gap-3">
+                    <input type="text" name="NewClassName" class="form-control" placeholder="Class Name" required />
+                    <input type="number" name="NewStudentCount" class="form-control" placeholder="Student Count" required />
+                    <input type="text" name="NewDescription" class="form-control" placeholder="Description" />
+                    <button type="submit" class="btn btn-primary w-100">➕ Add Class</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-<nav>
-    <ul class="pagination">
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                <a class="page-link" href="?PageNumber=@i&Filter=@Model.Filter">@i</a>
-            </li>
-        }
-    </ul>
-</nav>
+    <!-- Sağ: Class Table -->
+    <div class="col-md-8">
+        <!-- Filter -->
+        <form method="get" class="d-flex mb-3">
+            <input type="text" name="Filter" value="@Model.Filter" class="form-control me-2" placeholder="🔍 Search by Class Name...">
+            <button class="btn btn-outline-primary">Search</button>
+        </form>
+
+        <!-- Table -->
+        <div class="table-responsive shadow-sm rounded-4">
+            <table class="table table-hover table-bordered align-middle mb-0 rounded-4 overflow-hidden">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Class Name</th>
+                        <th>Students</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @for (int i = 0; i < Model.PagedList.Count; i++)
+                    {
+                        var item = Model.PagedList[i];
+                        int indexNumber = ((Model.PageNumber - 1) * IndexModel.PageSize) + i + 1;
+                        <tr>
+                            <td><span class="badge bg-secondary">@indexNumber</span></td>
+                            <td>@item.ClassName</td>
+                            <td>@item.StudentCount</td>
+                            <td>@item.Description</td>
+                            <td>
+                                <form method="post" asp-page-handler="DeleteClass" class="d-inline">
+                                    <input type="hidden" name="DeleteId" value="@item.Id" />
+                                    <button class="btn btn-danger btn-sm">🗑️</button>
+                                </form>
+                                <button type="button" class="btn btn-warning btn-sm"
+                                        onclick="editClass('@item.Id', '@item.ClassName', '@item.StudentCount', '@item.Description')">
+                                    ✏️
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                        <a class="page-link rounded-circle mx-1 @(Model.PageNumber == i ? "bg-success text-white" : "")"
+                           asp-page="./Index" asp-route-PageNumber="@i" asp-route-Filter="@Model.Filter">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" asp-page-handler="EditClass">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header bg-warning text-white rounded-top-4">
+                    <h5 class="modal-title">✏️ Edit Class</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-grid gap-3">
+                    <input type="hidden" id="EditId" name="EditId" />
+                    <input type="text" id="EditName" name="EditName" class="form-control" required />
+                    <input type="number" id="EditStudentCount" name="EditStudentCount" class="form-control" required />
+                    <input type="text" id="EditDescription" name="EditDescription" class="form-control" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning w-100">💾 Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
-<script>
-    let selectedColumns = [];
+    <script>
+        function exportCurrentPage() {
+            let pageNumber = "@Model.PageNumber";
+            let filter = "@Model.Filter";
+            let url = "/Index?handler=ExportCurrentPage&PageNumber=" + pageNumber + "&Filter=" + encodeURIComponent(filter || "");
 
-    document.querySelectorAll(".selectable").forEach(header => {
-        header.addEventListener("click", () => {
-            const col = header.dataset.col;
-            const index = selectedColumns.indexOf(col);
-            if (index > -1) {
-                selectedColumns.splice(index, 1);
-                header.style.backgroundColor = "";
-            } else {
-                selectedColumns.push(col);
-                header.style.backgroundColor = "#b2ebf2";
-            }
-        });
-    });
+            window.location.href = url;
+        }
 
-    document.getElementById("exportAll").addEventListener("click", () => {
-        const url = `/Index?handler=ExportJson&filtered=false&columns=${selectedColumns.join(',')}`;
-        window.location.href = url;
-    });
+        function editClass(id, name, count, desc) {
+            document.getElementById("EditId").value = id;
+            document.getElementById("EditName").value = name;
+            document.getElementById("EditStudentCount").value = count;
+            document.getElementById("EditDescription").value = desc;
 
-    document.getElementById("exportFiltered").addEventListener("click", () => {
-        const url = `/Index?handler=ExportJson&filtered=true&columns=${selectedColumns.join(',')}`;
-        window.location.href = url;
-    });
-</script>
+            const modal = new bootstrap.Modal(document.getElementById("editModal"));
+            modal.show();
+        }
+    </script>
 }
