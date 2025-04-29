@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Information</title>
+    <link rel="stylesheet" href="arka.css">
+    <script src="table.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="https://media.contentapi.ea.com/content/dam/bf/common/bf1-general-gamelogo.png" />
+        </div>
+        <nav>
+            <ul>
+                <button type="button">Galeri</button>
+                <button type="button">İletişim</button>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Class Information</h2>
+        
+       
+        <form id="classForm">
+            <div class="input-group">
+                <label for="className">Class Name</label>
+                <input type="text" id="className" required>
+            </div>
+            <div class="input-group">
+                <label for="numPeople">Number of People</label>
+                <input type="number" id="numPeople" required>
+            </div>
+            <div class="input-group">
+                <label for="description">Description</label>
+                <textarea id="description" required></textarea>
+            </div>
+            <button type="submit">Add Class</button>
+        </form>
+        
+        
+        <table id="classTable">
+            <thead>
+                <tr>
+                    <th>Class Name</th>
+                    <th>Number of People</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+              
+            </tbody>
+        </table>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Battlefield 1. Tüm hakları saklıdır.</p>
+    </footer>
+</body>
+</html>
