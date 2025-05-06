@@ -1,0 +1,36 @@
+@page
+@model LabProject.Pages.Classes.CreateModel
+@{
+    ViewData["Title"] = "Add New Class";
+}
+
+<h2>Add New Class</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="NewClass.Name"></label>
+        <input asp-for="NewClass.Name" class="form-control" />
+        <span asp-validation-for="NewClass.Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NewClass.StudentCount"></label>
+        <input asp-for="NewClass.StudentCount" class="form-control" />
+        <span asp-validation-for="NewClass.StudentCount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NewClass.Description"></label>
+        <textarea asp-for="NewClass.Description" class="form-control"></textarea>
+        <span asp-validation-for="NewClass.Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NewClass.IsActive"></label>
+        <input asp-for="NewClass.IsActive" class="form-check-input" />
+        <span asp-validation-for="NewClass.IsActive" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

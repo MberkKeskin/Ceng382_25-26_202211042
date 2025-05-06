@@ -1,35 +1,34 @@
-// Utils.cs
 using System.Text.Json;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LabProject.Helpers
 {
     public class Utils
     {
-        private static readonly Utils _instance = new Utils();
-        public static Utils Instance => _instance;
+        public static Utils Instance { get; } = new Utils();
+
         private Utils() { }
+
+        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions { WriteIndented = true };
 
         public string ToJson<T>(List<T> data, List<string>? selectedColumns = null)
         {
-            var result = new List<Dictionary<string, object>>();
-            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            List<Dictionary<string, object>> result = new List<Dictionary<string, object>>();
+            PropertyInfo[] props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-            foreach (var item in data)
+            foreach (T item in data)
             {
-                var dict = new Dictionary<string, object>();
-                if (selectedColumns == null || !selectedColumns.Any())
+                Dictionary<string, object> dict = new Dictionary<string, object>();
+                if (selectedColumns == null || selectedColumns.Count == 0)
                 {
-                    foreach (var prop in props)
+                    foreach (PropertyInfo prop in props)
                     {
                         dict[prop.Name] = prop.GetValue(item);
                     }
                 }
                 else
                 {
-                    foreach (var prop in props)
+                    foreach (PropertyInfo prop in props)
                     {
                         if (selectedColumns.Contains(prop.Name))
                         {
@@ -40,7 +39,7 @@ namespace LabProject.Helpers
                 result.Add(dict);
             }
 
-            return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+            return JsonSerializer.Serialize(result, _jsonOptions);
         }
     }
 }

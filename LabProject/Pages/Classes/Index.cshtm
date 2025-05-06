@@ -1,0 +1,72 @@
+@page
+@model LabProject.Pages.Classes.IndexModel
+@{
+    ViewData["Title"] = "Class Management";
+}
+
+<h2>Class Management</h2>
+
+<!-- Add New Class -->
+<form method="post" asp-page-handler="AddClass" class="mb-4">
+    <input type="text" name="NewClassName" placeholder="Class Name" required class="form-control mb-2" />
+    <input type="number" name="NewStudentCount" placeholder="Student Count" required class="form-control mb-2" />
+    <input type="text" name="NewDescription" placeholder="Description" class="form-control mb-2" />
+    <button type="submit" class="btn btn-primary">Add Class</button>
+</form>
+
+<!-- Class List -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Students</th>
+            <th>Description</th>
+            <th>IsActive</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cls in Model.ClassList)
+        {
+            <tr>
+                <td>@cls.Name</td>
+                <td>@cls.PersonCount</td>
+                <td>@cls.Description</td>
+                <td>@cls.IsActive</td>
+                <td>
+                    <form method="post" asp-page-handler="DeleteClass" class="d-inline">
+                        <input type="hidden" name="DeleteId" value="@cls.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+
+                    <button class="btn btn-warning btn-sm" onclick="fillEditForm(@cls.Id, '@cls.Name', @cls.PersonCount, '@cls.Description')">Edit</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Edit Form -->
+<div class="card mt-4">
+    <div class="card-header">Edit Class</div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="EditClass">
+            <input type="hidden" id="EditId" name="EditId" />
+            <input type="text" id="EditName" name="EditName" class="form-control mb-2" placeholder="Class Name" required />
+            <input type="number" id="EditStudentCount" name="EditStudentCount" class="form-control mb-2" placeholder="Student Count" required />
+            <input type="text" id="EditDescription" name="EditDescription" class="form-control mb-2" placeholder="Description" />
+            <button type="submit" class="btn btn-success">Save</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function fillEditForm(id, name, count, desc) {
+            document.getElementById("EditId").value = id;
+            document.getElementById("EditName").value = name;
+            document.getElementById("EditStudentCount").value = count;
+            document.getElementById("EditDescription").value = desc;
+        }
+    </script>
+}

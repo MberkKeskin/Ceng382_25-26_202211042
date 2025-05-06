@@ -1,19 +1,19 @@
 ﻿@page
 @model LabProject.Pages.IndexModel
+
+
 @{
     ViewData["Title"] = "Class Management";
 }
 
-<!-- Üst Menü -->
+
 <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
-    <button type="button" class="btn btn-success" onclick="exportCurrentPage()">📥 Export JSON</button>
-    <form method="get" asp-page="/Logout">
-        <button type="submit" class="btn btn-outline-danger">🚪 Logout</button>
-    </form>
+   
+   
 </div>
 
 <div class="row">
-    <!-- Sol: Add New Class -->
+
     <div class="col-md-4">
         <div class="card shadow-sm rounded-4">
             <div class="card-header bg-gradient bg-info text-white text-center fs-5 rounded-top-4">
@@ -30,15 +30,15 @@
         </div>
     </div>
 
-    <!-- Sağ: Class Table -->
+   
     <div class="col-md-8">
-        <!-- Filter -->
+       
         <form method="get" class="d-flex mb-3">
             <input type="text" name="Filter" value="@Model.Filter" class="form-control me-2" placeholder="🔍 Search by Class Name...">
             <button class="btn btn-outline-primary">Search</button>
         </form>
 
-        <!-- Table -->
+      
         <div class="table-responsive shadow-sm rounded-4">
             <table class="table table-hover table-bordered align-middle mb-0 rounded-4 overflow-hidden">
                 <thead class="table-primary text-center">
@@ -57,7 +57,7 @@
                         int indexNumber = ((Model.PageNumber - 1) * IndexModel.PageSize) + i + 1;
                         <tr>
                             <td><span class="badge bg-secondary">@indexNumber</span></td>
-                            <td>@item.ClassName</td>
+                            <td>@item.Name</td>
                             <td>@item.StudentCount</td>
                             <td>@item.Description</td>
                             <td>
@@ -66,7 +66,7 @@
                                     <button class="btn btn-danger btn-sm">🗑️</button>
                                 </form>
                                 <button type="button" class="btn btn-warning btn-sm"
-                                        onclick="editClass('@item.Id', '@item.ClassName', '@item.StudentCount', '@item.Description')">
+                                        onclick="editClass('@item.Id', '@item.Name', '@item.StudentCount', '@item.Description')">
                                     ✏️
                                 </button>
                             </td>
@@ -76,7 +76,7 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+       
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
                 @for (int i = 1; i <= Model.TotalPages; i++)
@@ -93,7 +93,7 @@
     </div>
 </div>
 
-<!-- Edit Modal -->
+
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form method="post" asp-page-handler="EditClass">
@@ -118,13 +118,7 @@
 
 @section Scripts {
     <script>
-        function exportCurrentPage() {
-            let pageNumber = "@Model.PageNumber";
-            let filter = "@Model.Filter";
-            let url = "/Index?handler=ExportCurrentPage&PageNumber=" + pageNumber + "&Filter=" + encodeURIComponent(filter || "");
-
-            window.location.href = url;
-        }
+        
 
         function editClass(id, name, count, desc) {
             document.getElementById("EditId").value = id;
