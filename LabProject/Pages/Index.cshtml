@@ -1,19 +1,26 @@
 ﻿@page
 @model LabProject.Pages.IndexModel
-
+@using Microsoft.AspNetCore.Identity
+@using LabProject.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Class Management";
 }
 
-
 <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
-   
-   
+    @if (SignInManager.IsSignedIn(User))
+    {
+      
+    }
+    else
+    {
+        
+    }
 </div>
 
 <div class="row">
-
     <div class="col-md-4">
         <div class="card shadow-sm rounded-4">
             <div class="card-header bg-gradient bg-info text-white text-center fs-5 rounded-top-4">
@@ -30,15 +37,12 @@
         </div>
     </div>
 
-   
     <div class="col-md-8">
-       
         <form method="get" class="d-flex mb-3">
             <input type="text" name="Filter" value="@Model.Filter" class="form-control me-2" placeholder="🔍 Search by Class Name...">
             <button class="btn btn-outline-primary">Search</button>
         </form>
 
-      
         <div class="table-responsive shadow-sm rounded-4">
             <table class="table table-hover table-bordered align-middle mb-0 rounded-4 overflow-hidden">
                 <thead class="table-primary text-center">
@@ -76,7 +80,6 @@
             </table>
         </div>
 
-       
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
                 @for (int i = 1; i <= Model.TotalPages; i++)
@@ -93,7 +96,7 @@
     </div>
 </div>
 
-
+<!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form method="post" asp-page-handler="EditClass">
@@ -118,8 +121,6 @@
 
 @section Scripts {
     <script>
-        
-
         function editClass(id, name, count, desc) {
             document.getElementById("EditId").value = id;
             document.getElementById("EditName").value = name;
